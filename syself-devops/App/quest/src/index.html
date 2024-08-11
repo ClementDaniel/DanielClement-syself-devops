@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training API</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #785391;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #007BFF;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            background-color: hsl(79, 100%, 50%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .secret-word {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Training API</h1>
+        <p>Click the button below to view the SECRET WORD.</p>
+        <button class="btn" onclick="fetchSecretWord()">Get SECRET</button>
+        <div class="secret-word" id="secret-word"></div>
+    </div>
+    <footer>
+        &copy; 2024 Training. All rights reserved.
+    </footer>
+    <script>
+        function fetchSecretWord() {
+            fetch('/secret_word')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('secret-word').innerText = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching the secret word:', error);
+                    document.getElementById('secret-word').innerText = 'Failed to fetch the SECRET_WORD.';
+                });
+        }
+    </script>
+</body>
+</html>
