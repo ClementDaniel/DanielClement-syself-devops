@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-node-app-db
+  labels:
+    app: quest
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: quest
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pv-claim
+  labels:
+    app: quest
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-node-app-db
+  labels:
+    app: quest
+spec:
+  selector:
+    matchLabels:
+      app: quest
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: quest
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:10.0
+        name: my-node-app
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-pass
+              key: password
+        - name: db
+          value: quest
+        - name: MYSQL_USER
+          value: quest-user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: db
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/db
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: db-pv-claim
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: quest
+    spec:
+      initContainers:
+      - name: init-quest
+        image: my-node-app
